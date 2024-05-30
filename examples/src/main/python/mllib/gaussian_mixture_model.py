@@ -18,13 +18,12 @@
 """
 A Gaussian Mixture Model clustering program using MLlib.
 """
-
-import random
 import argparse
 import numpy as np
 
 from pyspark import SparkConf, SparkContext
 from pyspark.mllib.clustering import GaussianMixture
+import secrets
 
 
 def parseVector(line):
@@ -47,7 +46,7 @@ if __name__ == "__main__":
     parser.add_argument('k', type=int, help='Number of clusters')
     parser.add_argument('--convergenceTol', default=1e-3, type=float, help='convergence threshold')
     parser.add_argument('--maxIterations', default=100, type=int, help='Number of iterations')
-    parser.add_argument('--seed', default=random.getrandbits(19),
+    parser.add_argument('--seed', default=secrets.SystemRandom().getrandbits(19),
                         type=int, help='Random seed')
     args = parser.parse_args()
 
