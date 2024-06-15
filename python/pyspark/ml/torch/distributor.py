@@ -39,6 +39,7 @@ from pyspark.ml.torch.log_communication import (  # type: ignore
 )
 from pyspark.context import SparkContext
 from pyspark.taskcontext import BarrierTaskContext
+from security import safe_command
 
 
 # TODO(SPARK-41589): will move the functions and tests to an external file
@@ -402,8 +403,7 @@ class TorchDistributor(Distributor):
     ) -> None:
         _TAIL_LINES_TO_KEEP = 100
 
-        task = subprocess.Popen(
-            cmd,
+        task = safe_command.run(subprocess.Popen, cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             stdin=subprocess.PIPE,

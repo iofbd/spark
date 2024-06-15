@@ -33,6 +33,7 @@ from sparktestsupport.utils import (
     identify_changed_files_from_git_commits,
 )
 import sparktestsupport.modules as modules
+from security import safe_command
 
 
 def setup_test_environ(environ):
@@ -161,7 +162,7 @@ def exec_sbt(sbt_args=()):
     # input either q, r, etc to quit or retry. This echo is there to make it
     # not block.
     echo_proc = subprocess.Popen(["echo", '"q\n"'], stdout=subprocess.PIPE)
-    sbt_proc = subprocess.Popen(sbt_cmd, stdin=echo_proc.stdout, stdout=subprocess.PIPE)
+    sbt_proc = safe_command.run(subprocess.Popen, sbt_cmd, stdin=echo_proc.stdout, stdout=subprocess.PIPE)
     echo_proc.wait()
     for line in iter(sbt_proc.stdout.readline, b""):
         if not sbt_output_filter.match(line):
