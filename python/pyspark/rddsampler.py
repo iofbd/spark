@@ -16,18 +16,18 @@
 #
 
 import sys
-import random
 import math
+import secrets
 
 
 class RDDSamplerBase:
     def __init__(self, withReplacement, seed=None):
-        self._seed = seed if seed is not None else random.randint(0, sys.maxsize)
+        self._seed = seed if seed is not None else secrets.SystemRandom().randint(0, sys.maxsize)
         self._withReplacement = withReplacement
         self._random = None
 
     def initRandomGenerator(self, split):
-        self._random = random.Random(self._seed ^ split)
+        self._random = secrets.SystemRandom().Random(self._seed ^ split)
 
         # mixing because the initial seeds are close to each other
         for _ in range(10):

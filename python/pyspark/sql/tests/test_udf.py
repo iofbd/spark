@@ -41,6 +41,7 @@ from pyspark.sql.types import (
 from pyspark.errors import AnalysisException
 from pyspark.testing.sqlutils import ReusedSQLTestCase, test_compiled, test_not_compiled_message
 from pyspark.testing.utils import QuietTest
+import secrets
 
 
 class BaseUDFTestsMixin(object):
@@ -115,10 +116,8 @@ class BaseUDFTestsMixin(object):
             )
 
     def test_nondeterministic_udf(self):
-        # Test that nondeterministic UDFs are evaluated only once in chained UDF evaluations
-        import random
 
-        udf_random_col = udf(lambda: int(100 * random.random()), IntegerType()).asNondeterministic()
+        udf_random_col = udf(lambda: int(100 * secrets.SystemRandom().random()), IntegerType()).asNondeterministic()
         self.assertEqual(udf_random_col.deterministic, False)
         df = self.spark.createDataFrame([Row(1)]).select(udf_random_col().alias("RAND"))
         udf_add_ten = udf(lambda rand: rand + 10, IntegerType())
@@ -126,9 +125,8 @@ class BaseUDFTestsMixin(object):
         self.assertEqual(row[0] + 10, row[1])
 
     def test_nondeterministic_udf2(self):
-        import random
 
-        random_udf = udf(lambda: random.randint(6, 6), IntegerType()).asNondeterministic()
+        random_udf = udf(lambda: secrets.SystemRandom().randint(6, 6), IntegerType()).asNondeterministic()
         self.assertEqual(random_udf.deterministic, False)
         random_udf1 = self.spark.catalog.registerFunction("randInt", random_udf)
         self.assertEqual(random_udf1.deterministic, False)
@@ -139,7 +137,7 @@ class BaseUDFTestsMixin(object):
         [row] = self.spark.range(1).select(random_udf()).collect()
         self.assertEqual(row[0], 6)
         # render_doc() reproduces the help() exception without printing output
-        pydoc.render_doc(udf(lambda: random.randint(6, 6), IntegerType()))
+        pydoc.render_doc(udf(lambda: secrets.SystemRandom().randint(6, 6), IntegerType()))
         pydoc.render_doc(random_udf)
         pydoc.render_doc(random_udf1)
         pydoc.render_doc(udf(lambda x: x).asNondeterministic)
@@ -162,9 +160,8 @@ class BaseUDFTestsMixin(object):
 
     def check_nondeterministic_udf_in_aggregate(self):
         from pyspark.sql.functions import sum
-        import random
 
-        udf_random_col = udf(lambda: int(100 * random.random()), "int").asNondeterministic()
+        udf_random_col = udf(lambda: int(100 * secrets.SystemRandom().random()), "int").asNondeterministic()
         df = self.spark.range(10)
 
         with self.assertRaisesRegex(AnalysisException, "nondeterministic"):

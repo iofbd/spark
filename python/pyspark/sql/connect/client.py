@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+import secrets
+
 __all__ = [
     "ChannelBuilder",
     "SparkConnectClient",
@@ -27,7 +29,6 @@ check_dependencies(__name__)
 
 import logging
 import os
-import random
 import time
 import urllib.parse
 import uuid
@@ -1212,8 +1213,7 @@ class Retrying:
 
             # Do backoff
             if retry_state.count() > 0:
-                backoff = random.randrange(
-                    0,
+                backoff = secrets.SystemRandom().randrange(0,
                     int(
                         min(
                             self._initial_backoff * self._backoff_multiplier ** retry_state.count(),

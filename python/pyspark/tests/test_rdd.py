@@ -17,7 +17,6 @@
 from datetime import datetime, timedelta
 import hashlib
 import os
-import random
 import tempfile
 import time
 import unittest
@@ -38,6 +37,7 @@ from pyspark.serializers import (
 from pyspark.sql import SparkSession
 from pyspark.testing.utils import ReusedPySparkTestCase, SPARK_HOME, QuietTest, have_numpy
 from pyspark.testing.sqlutils import have_pandas
+import secrets
 
 
 global_func = lambda: "Hi"  # noqa: E731
@@ -361,7 +361,7 @@ class RDDTests(ReusedPySparkTestCase):
         N = 1 << 21
         b1 = self.sc.broadcast(set(range(N)))  # multiple blocks in JVM
         r = list(range(1 << 15))
-        random.shuffle(r)
+        secrets.SystemRandom().shuffle(r)
         s = str(r).encode()
         checksum = hashlib.md5(s).hexdigest()
         b2 = self.sc.broadcast(s)
@@ -377,7 +377,7 @@ class RDDTests(ReusedPySparkTestCase):
         self.assertEqual(N, size)
         self.assertEqual(checksum, csum)
 
-        random.shuffle(r)
+        secrets.SystemRandom().shuffle(r)
         s = str(r).encode()
         checksum = hashlib.md5(s).hexdigest()
         b2 = self.sc.broadcast(s)
