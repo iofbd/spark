@@ -30,6 +30,7 @@ from py4j.java_gateway import java_import, JavaGateway, JavaObject, GatewayParam
 from py4j.clientserver import ClientServer, JavaParameters, PythonParameters
 from pyspark.find_spark_home import _find_spark_home
 from pyspark.serializers import read_int, write_with_length, UTF8Deserializer
+from security import safe_command
 
 
 def launch_gateway(conf=None, popen_kwargs=None):
@@ -93,10 +94,10 @@ def launch_gateway(conf=None, popen_kwargs=None):
                     signal.signal(signal.SIGINT, signal.SIG_IGN)
 
                 popen_kwargs["preexec_fn"] = preexec_func
-                proc = Popen(command, **popen_kwargs)
+                proc = safe_command.run(Popen, command, **popen_kwargs)
             else:
                 # preexec_fn not supported on Windows
-                proc = Popen(command, **popen_kwargs)
+                proc = safe_command.run(Popen, command, **popen_kwargs)
 
             # Wait for the file to appear, or for the process to exit, whichever happens first.
             while not proc.poll() and not os.path.isfile(conn_info_file):

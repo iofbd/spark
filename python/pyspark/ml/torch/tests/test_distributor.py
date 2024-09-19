@@ -28,6 +28,7 @@ import threading
 from typing import Callable, Dict, Any
 import unittest
 from unittest.mock import patch
+from security import safe_command
 
 have_torch = True
 try:
@@ -473,7 +474,7 @@ class TorchWrapperUnitTests(unittest.TestCase):
             clean_and_terminate(task)
 
         command = [sys.executable, "-c", '"import time; time.sleep(20)"']
-        task = subprocess.Popen(command)
+        task = safe_command.run(subprocess.Popen, command)
         t = threading.Thread(target=kill_task, args=(task,))
         t.start()
         time.sleep(2)
@@ -482,7 +483,7 @@ class TorchWrapperUnitTests(unittest.TestCase):
     @patch("pyspark.ml.torch.torch_run_process_wrapper.clean_and_terminate")
     def test_check_parent_alive(self, mock_clean_and_terminate: Callable) -> None:
         command = [sys.executable, "-c", '"import time; time.sleep(2)"']
-        task = subprocess.Popen(command)
+        task = safe_command.run(subprocess.Popen, command)
         t = threading.Thread(target=check_parent_alive, args=(task,), daemon=True)
         t.start()
         time.sleep(2)
