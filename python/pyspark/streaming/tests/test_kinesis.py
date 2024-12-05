@@ -24,6 +24,7 @@ from pyspark.testing.streamingutils import (
     kinesis_requirement_message,
     PySparkStreamingTestCase,
 )
+import secrets
 
 
 @unittest.skipIf(not should_test_kinesis, kinesis_requirement_message)
@@ -56,9 +57,8 @@ class KinesisStreamTests(PySparkStreamingTestCase):
         )
 
     def test_kinesis_stream(self):
-        import random
 
-        kinesisAppName = "KinesisStreamTests-%d" % abs(random.randint(0, 10000000))
+        kinesisAppName = "KinesisStreamTests-%d" % abs(secrets.SystemRandom().randint(0, 10000000))
         kinesisTestUtils = self.ssc._jvm.org.apache.spark.streaming.kinesis.KinesisTestUtils(2)
         try:
             kinesisTestUtils.createStream()

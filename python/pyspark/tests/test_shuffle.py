@@ -14,7 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import random
 import unittest
 import tempfile
 import os
@@ -30,6 +29,7 @@ from pyspark.shuffle import (
     Merger,
     ExternalGroupBy,
 )
+import secrets
 
 
 class MergerTests(unittest.TestCase):
@@ -212,7 +212,7 @@ class ExternalGroupByTests(unittest.TestCase):
 class SorterTests(unittest.TestCase):
     def test_in_memory_sort(self):
         lst = list(range(1024))
-        random.shuffle(lst)
+        secrets.SystemRandom().shuffle(lst)
         sorter = ExternalSorter(1024)
         self.assertEqual(sorted(lst), list(sorter.sorted(lst)))
         self.assertEqual(sorted(lst, reverse=True), list(sorter.sorted(lst, reverse=True)))
@@ -228,7 +228,7 @@ class SorterTests(unittest.TestCase):
                 return self.memory_limit
 
         lst = list(range(1024))
-        random.shuffle(lst)
+        secrets.SystemRandom().shuffle(lst)
         sorter = CustomizedSorter(1)
         self.assertEqual(sorted(lst), list(sorter.sorted(lst)))
         self.assertGreater(shuffle.DiskBytesSpilled, 0)
@@ -249,7 +249,7 @@ class SorterTests(unittest.TestCase):
         conf = SparkConf().set("spark.python.worker.memory", "1m")
         sc = SparkContext(conf=conf)
         lst = list(range(10240))
-        random.shuffle(lst)
+        secrets.SystemRandom().shuffle(lst)
         rdd = sc.parallelize(lst, 4)
         self.assertEqual(sorted(lst), rdd.sortBy(lambda x: x).collect())
         sc.stop()

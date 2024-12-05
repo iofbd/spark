@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-import random
 import shutil
 import string
 import sys
@@ -41,6 +40,7 @@ from pyspark.testing.sqlutils import (
     pyarrow_requirement_message,
 )
 from pyspark.testing.utils import eventually
+import secrets
 
 if have_pandas:
     import pandas as pd
@@ -125,7 +125,7 @@ class GroupedApplyInPandasWithStateTests(ReusedSQLTestCase):
             data_range = list(string.ascii_lowercase)
             for i in range(5):
                 picked_data = [
-                    data_range[random.randrange(0, len(data_range) - 1)] for x in range(100)
+                    data_range[secrets.SystemRandom().randrange(0, len(data_range) - 1)] for x in range(100)
                 ]
 
                 with open(input_path + "/part-%i.txt" % i, "w") as fw:
@@ -154,7 +154,7 @@ class GroupedApplyInPandasWithStateTests(ReusedSQLTestCase):
                 # user function call will happen at most 26 times
                 # should be huge enough to not trigger kill in every batches
                 # but should be also reasonable to trigger kill multiple times across batches
-                if random.randrange(30) == 1:
+                if secrets.SystemRandom().randrange(30) == 1:
                     sys.exit(1)
 
                 count = state.getOption

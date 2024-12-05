@@ -16,7 +16,6 @@
 #
 
 import sys
-import random
 
 from pyspark import RDD, since
 from pyspark.mllib.common import callMLlibFunc, inherit_doc, JavaModelWrapper
@@ -25,6 +24,7 @@ from pyspark.mllib.regression import LabeledPoint
 from pyspark.mllib.util import JavaLoader, JavaSaveable
 from typing import Dict, Optional, Tuple, Union, overload, TYPE_CHECKING
 from pyspark.rdd import RDD
+import secrets
 
 if TYPE_CHECKING:
     from pyspark.mllib._typing import VectorLike
@@ -416,7 +416,7 @@ class RandomForest:
         if featureSubsetStrategy not in cls.supportedFeatureSubsetStrategies:
             raise ValueError("unsupported featureSubsetStrategy: %s" % featureSubsetStrategy)
         if seed is None:
-            seed = random.randint(0, 1 << 30)
+            seed = secrets.SystemRandom().randint(0, 1 << 30)
         model = callMLlibFunc(
             "trainRandomForestModel",
             data,
