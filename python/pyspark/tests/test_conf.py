@@ -14,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-import random
 import unittest
 
 from pyspark import SparkContext, SparkConf
+import secrets
 
 
 class ConfTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class ConfTests(unittest.TestCase):
         for memory in memoryList:
             sc = SparkContext(conf=SparkConf().set("spark.python.worker.memory", memory))
             lst = list(range(1024))
-            random.shuffle(lst)
+            secrets.SystemRandom().shuffle(lst)
             rdd = sc.parallelize(lst, 4)
             self.assertEqual(sorted(lst), rdd.sortBy(lambda x: x).collect())
             sc.stop()

@@ -15,6 +15,7 @@
 # limitations under the License.
 #
 from pyspark.sql.connect.utils import check_dependencies
+import secrets
 
 check_dependencies(__name__)
 
@@ -35,7 +36,6 @@ from typing import (
 )
 
 import sys
-import random
 import pandas
 import pyarrow as pa
 import json
@@ -756,7 +756,7 @@ class DataFrame:
         for w in weights:
             if w < 0.0:
                 raise ValueError("Weights must be positive. Found weight value: %s" % w)
-        seed = seed if seed is not None else random.randint(0, sys.maxsize)
+        seed = seed if seed is not None else secrets.SystemRandom().randint(0, sys.maxsize)
         total = sum(weights)
         if total <= 0:
             raise ValueError("Sum of weights must be positive, but got: %s" % w)
@@ -1290,7 +1290,7 @@ class DataFrame:
                     },
                 )
             fractions[k] = float(v)
-        seed = seed if seed is not None else random.randint(0, sys.maxsize)
+        seed = seed if seed is not None else secrets.SystemRandom().randint(0, sys.maxsize)
         return DataFrame.withPlan(
             plan.StatSampleBy(child=self._plan, col=col, fractions=fractions, seed=seed),
             session=self._session,

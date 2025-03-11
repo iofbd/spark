@@ -18,7 +18,6 @@
 import json
 import os
 import sys
-import random
 import warnings
 from collections.abc import Iterable
 from functools import reduce
@@ -64,6 +63,7 @@ from pyspark.sql.types import (
 from pyspark.sql.utils import get_active_spark_context
 from pyspark.sql.pandas.conversion import PandasConversionMixin
 from pyspark.sql.pandas.map_ops import PandasMapOpsMixin
+import secrets
 
 if TYPE_CHECKING:
     from pyspark._typing import PrimitiveType
@@ -1947,7 +1947,7 @@ class DataFrame(PandasMapOpsMixin, PandasConversionMixin):
                 )
             fractions[k] = float(v)
         col = col._jc
-        seed = seed if seed is not None else random.randint(0, sys.maxsize)
+        seed = seed if seed is not None else secrets.SystemRandom().randint(0, sys.maxsize)
         return DataFrame(
             self._jdf.stat().sampleBy(col, self._jmap(fractions), seed), self.sparkSession
         )
@@ -1992,7 +1992,7 @@ class DataFrame(PandasMapOpsMixin, PandasConversionMixin):
         for w in weights:
             if w < 0.0:
                 raise ValueError("Weights must be positive. Found weight value: %s" % w)
-        seed = seed if seed is not None else random.randint(0, sys.maxsize)
+        seed = seed if seed is not None else secrets.SystemRandom().randint(0, sys.maxsize)
         df_array = self._jdf.randomSplit(
             _to_list(self.sparkSession._sc, cast(List["ColumnOrName"], weights)), int(seed)
         )

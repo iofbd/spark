@@ -16,7 +16,6 @@
 #
 import os
 import pickle
-import random
 import time
 import tempfile
 import unittest
@@ -27,6 +26,7 @@ from pyspark import SparkConf, SparkContext, Broadcast
 from pyspark.java_gateway import launch_gateway
 from pyspark.serializers import ChunkedStream
 from pyspark.sql import SparkSession, Row
+import secrets
 
 
 class BroadcastTest(unittest.TestCase):
@@ -147,7 +147,7 @@ class BroadcastFrameProtocolTest(unittest.TestCase):
         gateway = launch_gateway(SparkConf())
         cls._jvm = gateway.jvm
         cls.longMessage = True
-        random.seed(42)
+        secrets.SystemRandom().seed(42)
 
     def _test_chunked_stream(self, data, py_buf_size):
         # write data using the chunked protocol from python.
@@ -177,7 +177,7 @@ class BroadcastFrameProtocolTest(unittest.TestCase):
 
     def test_chunked_stream(self):
         def random_bytes(n):
-            return bytearray(random.getrandbits(8) for _ in range(n))
+            return bytearray(secrets.SystemRandom().getrandbits(8) for _ in range(n))
 
         for data_length in [1, 10, 100, 10000]:
             for buffer_length in [1, 2, 5, 8192]:

@@ -20,7 +20,6 @@ import collections
 import logging
 import math
 import os
-import random
 import re
 import shutil
 import subprocess
@@ -39,6 +38,7 @@ from pyspark.ml.torch.log_communication import (  # type: ignore
 )
 from pyspark.context import SparkContext
 from pyspark.taskcontext import BarrierTaskContext
+import secrets
 
 
 # TODO(SPARK-41589): will move the functions and tests to an external file
@@ -452,8 +452,8 @@ class TorchDistributor(Distributor):
         try:
             if self.use_gpu:
                 gpus_owned = get_gpus_owned(self.sc)
-                random.seed(hash(train_object))
-                selected_gpus = [str(e) for e in random.sample(gpus_owned, self.num_processes)]
+                secrets.SystemRandom().seed(hash(train_object))
+                selected_gpus = [str(e) for e in secrets.SystemRandom().sample(gpus_owned, self.num_processes)]
                 os.environ[CUDA_VISIBLE_DEVICES] = ",".join(selected_gpus)
 
             self.logger.info(f"Started local training with {self.num_processes} processes")
