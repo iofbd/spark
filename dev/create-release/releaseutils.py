@@ -21,6 +21,7 @@
 import re
 import sys
 from subprocess import Popen, PIPE
+from security import safe_command
 
 try:
     from jira.client import JIRA  # noqa: F401
@@ -58,11 +59,11 @@ def yesOrNoPrompt(msg):
 
 # Utility functions run git commands (written with Git 1.8.5)
 def run_cmd(cmd):
-    return Popen(cmd, stdout=PIPE).communicate()[0].decode("utf8")
+    return safe_command.run(Popen, cmd, stdout=PIPE).communicate()[0].decode("utf8")
 
 
 def run_cmd_error(cmd):
-    return Popen(cmd, stdout=PIPE, stderr=PIPE).communicate()[1].decode("utf8")
+    return safe_command.run(Popen, cmd, stdout=PIPE, stderr=PIPE).communicate()[1].decode("utf8")
 
 
 def get_date(commit_hash):

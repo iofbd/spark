@@ -24,6 +24,7 @@ import unittest
 import zipfile
 
 from pyspark.testing.utils import SPARK_HOME
+from security import safe_command
 
 
 class SparkSubmitTests(unittest.TestCase):
@@ -116,7 +117,7 @@ class SparkSubmitTests(unittest.TestCase):
             |print(sc.parallelize([1, 2, 3]).map(lambda x: x * 2).collect())
             """,
         )
-        proc = subprocess.Popen(self.sparkSubmit + [script], stdout=subprocess.PIPE)
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + [script], stdout=subprocess.PIPE)
         out, err = proc.communicate()
         self.assertEqual(0, proc.returncode)
         self.assertIn("[2, 4, 6]", out.decode("utf-8"))
@@ -135,7 +136,7 @@ class SparkSubmitTests(unittest.TestCase):
             |print(sc.parallelize([1, 2, 3]).map(foo).collect())
             """,
         )
-        proc = subprocess.Popen(self.sparkSubmit + [script], stdout=subprocess.PIPE)
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + [script], stdout=subprocess.PIPE)
         out, err = proc.communicate()
         self.assertEqual(0, proc.returncode)
         self.assertIn("[3, 6, 9]", out.decode("utf-8"))
@@ -159,8 +160,7 @@ class SparkSubmitTests(unittest.TestCase):
             |    return x + 1
             """,
         )
-        proc = subprocess.Popen(
-            self.sparkSubmit + ["--py-files", zip, script], stdout=subprocess.PIPE
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + ["--py-files", zip, script], stdout=subprocess.PIPE
         )
         out, err = proc.communicate()
         self.assertEqual(0, proc.returncode)
@@ -185,8 +185,7 @@ class SparkSubmitTests(unittest.TestCase):
             |    return x + 1
             """,
         )
-        proc = subprocess.Popen(
-            self.sparkSubmit + ["--py-files", zip, "--master", "local-cluster[1,1,1024]", script],
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + ["--py-files", zip, "--master", "local-cluster[1,1,1024]", script],
             stdout=subprocess.PIPE,
         )
         out, err = proc.communicate()
@@ -206,8 +205,7 @@ class SparkSubmitTests(unittest.TestCase):
             """,
         )
         self.create_spark_package("a:mylib:0.1")
-        proc = subprocess.Popen(
-            self.sparkSubmit
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit
             + ["--packages", "a:mylib:0.1", "--repositories", "file:" + self.programDir, script],
             stdout=subprocess.PIPE,
         )
@@ -228,8 +226,7 @@ class SparkSubmitTests(unittest.TestCase):
             """,
         )
         self.create_spark_package("a:mylib:0.1")
-        proc = subprocess.Popen(
-            self.sparkSubmit
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit
             + [
                 "--packages",
                 "a:mylib:0.1",
@@ -261,8 +258,7 @@ class SparkSubmitTests(unittest.TestCase):
         )
         # this will fail if you have different spark.executor.memory
         # in conf/spark-defaults.conf
-        proc = subprocess.Popen(
-            self.sparkSubmit + ["--master", "local-cluster[1,1,1024]", script],
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + ["--master", "local-cluster[1,1,1024]", script],
             stdout=subprocess.PIPE,
         )
         out, err = proc.communicate()
@@ -285,8 +281,7 @@ class SparkSubmitTests(unittest.TestCase):
             |    sc.stop()
             """,
         )
-        proc = subprocess.Popen(
-            self.sparkSubmit + ["--master", "local", script],
+        proc = safe_command.run(subprocess.Popen, self.sparkSubmit + ["--master", "local", script],
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
         )
