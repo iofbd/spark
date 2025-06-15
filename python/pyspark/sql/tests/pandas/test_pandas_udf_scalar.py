@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 import os
-import random
 import shutil
 import tempfile
 import time
@@ -60,6 +59,7 @@ from pyspark.testing.sqlutils import (
     pyarrow_requirement_message,
 )
 from pyspark.testing.utils import QuietTest
+import secrets
 
 if have_pandas:
     import pandas as pd
@@ -201,7 +201,7 @@ class ScalarPandasUDFTests(ReusedSQLTestCase):
 
     def test_register_nondeterministic_vectorized_udf_basic(self):
         random_pandas_udf = pandas_udf(
-            lambda x: random.randint(6, 6) + x, IntegerType()
+            lambda x: secrets.SystemRandom().randint(6, 6) + x, IntegerType()
         ).asNondeterministic()
         self.assertEqual(random_pandas_udf.deterministic, False)
         self.assertEqual(random_pandas_udf.evalType, PythonEvalType.SQL_SCALAR_PANDAS_UDF)
@@ -215,7 +215,7 @@ class ScalarPandasUDFTests(ReusedSQLTestCase):
 
         def random_iter_udf(it):
             for i in it:
-                yield random.randint(6, 6) + i
+                yield secrets.SystemRandom().randint(6, 6) + i
 
         random_pandas_iter_udf = pandas_udf(
             random_iter_udf, IntegerType(), PandasUDFType.SCALAR_ITER

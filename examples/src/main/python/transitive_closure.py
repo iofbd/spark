@@ -16,14 +16,14 @@
 #
 
 import sys
-from random import Random
 from typing import Set, Tuple
 
 from pyspark.sql import SparkSession
+import secrets
 
 numEdges = 200
 numVertices = 100
-rand = Random(42)
+rand = secrets.SystemRandom().Random(42)
 
 
 def generateGraph() -> Set[Tuple[int, int]]:

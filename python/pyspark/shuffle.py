@@ -22,7 +22,6 @@ import warnings
 import gc
 import itertools
 import operator
-import random
 import sys
 
 import heapq
@@ -34,6 +33,7 @@ from pyspark.serializers import (
     AutoBatchedSerializer,
 )
 from pyspark.util import fail_on_stopiteration
+import secrets
 
 
 try:
@@ -80,10 +80,10 @@ def _get_local_dirs(sub):
     if len(dirs) > 1:
         if sys.version_info < (3, 11):
             # different order in different processes and instances
-            rnd = random.Random(os.getpid() + id(dirs))
-            random.shuffle(dirs, rnd.random)
+            rnd = secrets.SystemRandom().Random(os.getpid() + id(dirs))
+            secrets.SystemRandom().shuffle(dirs, rnd.random)
         else:
-            random.shuffle(dirs)
+            secrets.SystemRandom().shuffle(dirs)
     return [os.path.join(d, "python", str(os.getpid()), sub) for d in dirs]
 
 

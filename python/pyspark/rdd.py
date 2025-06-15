@@ -23,7 +23,6 @@ import shlex
 import warnings
 import heapq
 import bisect
-import random
 from subprocess import Popen, PIPE
 from threading import Thread
 from collections import defaultdict
@@ -87,6 +86,7 @@ from pyspark.shuffle import (
 )
 from pyspark.traceback_utils import SCCallSiteSync
 from pyspark.util import fail_on_stopiteration, _parse_memory
+import secrets
 
 
 if TYPE_CHECKING:
@@ -1089,7 +1089,7 @@ class RDD(Generic[T_co]):
         for w in weights:
             cweights.append(cweights[-1] + w / s)
         if seed is None:
-            seed = random.randint(0, 2**32 - 1)
+            seed = secrets.SystemRandom().randint(0, 2**32 - 1)
         return [
             self.mapPartitionsWithIndex(RDDRangeSampler(lb, ub, seed).func, True)
             for lb, ub in zip(cweights, cweights[1:])
@@ -1156,7 +1156,7 @@ class RDD(Generic[T_co]):
         if initialCount == 0:
             return []
 
-        rand = random.Random(seed)
+        rand = secrets.SystemRandom().Random(seed)
 
         if (not withReplacement) and num >= initialCount:
             # shuffle current RDD and return

@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 import os
-import random
 import stat
 import sys
 import tempfile
@@ -24,6 +23,7 @@ import unittest
 
 from pyspark import SparkConf, SparkContext, TaskContext, BarrierTaskContext
 from pyspark.testing.utils import PySparkTestCase, SPARK_HOME, eventually
+import secrets
 
 
 class TaskContextTests(PySparkTestCase):
@@ -124,7 +124,7 @@ class TaskContextTests(PySparkTestCase):
 
         def context_barrier(x):
             tc = BarrierTaskContext.get()
-            time.sleep(random.randint(1, 5) * 2)
+            time.sleep(secrets.SystemRandom().randint(1, 5) * 2)
             tc.barrier()
             return time.time()
 
@@ -143,7 +143,7 @@ class TaskContextTests(PySparkTestCase):
 
         def context_barrier(x):
             tc = BarrierTaskContext.get()
-            time.sleep(random.randint(1, 10))
+            time.sleep(secrets.SystemRandom().randint(1, 10))
             out = tc.allGather(str(tc.partitionId()))
             pids = [int(e) for e in out]
             return pids
@@ -235,7 +235,7 @@ class TaskContextTestsWithWorkerReuse(unittest.TestCase):
 
         def context_barrier(x):
             tc = BarrierTaskContext.get()
-            time.sleep(random.randint(1, 5) * 2)
+            time.sleep(secrets.SystemRandom().randint(1, 5) * 2)
             tc.barrier()
             return (time.time(), os.getpid())
 
