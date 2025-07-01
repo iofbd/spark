@@ -19,6 +19,7 @@ import os
 import shutil
 import subprocess
 import sys
+from security import safe_command
 
 subprocess_check_output = subprocess.check_output
 
@@ -55,7 +56,7 @@ def run_cmd(cmd, return_output=False):
         if return_output:
             return subprocess_check_output(cmd).decode("utf-8")
         else:
-            return subprocess.run(cmd, universal_newlines=True, check=True)
+            return safe_command.run(subprocess.run, cmd, universal_newlines=True, check=True)
     except subprocess.CalledProcessError as e:
         exit_from_command_with_retcode(e.cmd, e.returncode)
 

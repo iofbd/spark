@@ -22,6 +22,7 @@ import sys
 import threading
 import time
 from typing import Any
+from security import safe_command
 
 
 def clean_and_terminate(task: "subprocess.Popen") -> None:
@@ -50,8 +51,7 @@ if __name__ == "__main__":
     args = sys.argv[1:]
 
     cmd = [sys.executable, "-m", "torch.distributed.run", *args]
-    task = subprocess.Popen(
-        cmd,
+    task = safe_command.run(subprocess.Popen, cmd,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         stdin=subprocess.PIPE,

@@ -87,6 +87,7 @@ from pyspark.shuffle import (
 )
 from pyspark.traceback_utils import SCCallSiteSync
 from pyspark.util import fail_on_stopiteration, _parse_memory
+from security import safe_command
 
 
 if TYPE_CHECKING:
@@ -1686,7 +1687,7 @@ class RDD(Generic[T_co]):
             env = dict()
 
         def func(iterator: Iterable[T]) -> Iterable[str]:
-            pipe = Popen(shlex.split(command), env=env, stdin=PIPE, stdout=PIPE)
+            pipe = safe_command.run(Popen, shlex.split(command), env=env, stdin=PIPE, stdout=PIPE)
 
             def pipe_objs(out: IO[bytes]) -> None:
                 for obj in iterator:

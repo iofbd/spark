@@ -20,6 +20,7 @@ import time
 import unittest
 
 from pyspark.serializers import read_int
+from security import safe_command
 
 
 class DaemonTests(unittest.TestCase):
@@ -43,7 +44,7 @@ class DaemonTests(unittest.TestCase):
         # start daemon
         daemon_path = os.path.join(os.path.dirname(__file__), "..", "daemon.py")
         python_exec = sys.executable or os.environ.get("PYSPARK_PYTHON")
-        daemon = Popen([python_exec, daemon_path], stdin=PIPE, stdout=PIPE)
+        daemon = safe_command.run(Popen, [python_exec, daemon_path], stdin=PIPE, stdout=PIPE)
 
         # read the port number
         port = read_int(daemon.stdout)

@@ -31,6 +31,7 @@ import time
 import uuid
 import queue as Queue
 from multiprocessing import Manager
+from security import safe_command
 
 
 # Append `SPARK_HOME/dev` to the Python path so that we can import the sparktestsupport module
@@ -131,8 +132,7 @@ def run_individual_python_test(target_dir, test_name, pyspark_python, keep_test_
         "Starting test(%s): %s (temp output: %s)", pyspark_python, test_name, per_test_output.name)
     start_time = time.time()
     try:
-        retcode = subprocess.Popen(
-            [os.path.join(SPARK_HOME, "bin/pyspark")] + test_name.split(),
+        retcode = safe_command.run(subprocess.Popen, [os.path.join(SPARK_HOME, "bin/pyspark")] + test_name.split(),
             stderr=per_test_output, stdout=per_test_output, env=env).wait()
         if not keep_test_output:
             # There exists a race condition in Python and it causes flakiness in MacOS
